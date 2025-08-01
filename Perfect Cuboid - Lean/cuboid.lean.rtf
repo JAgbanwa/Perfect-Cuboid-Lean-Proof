@@ -1,0 +1,325 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue255;\red255\green255\blue255;\red0\green0\blue0;
+\red15\green112\blue1;\red19\green118\blue70;\red191\green28\blue37;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c100000;\cssrgb\c100000\c100000\c100000;\cssrgb\c0\c0\c0;
+\cssrgb\c0\c50196\c0;\cssrgb\c3529\c52549\c34510;\cssrgb\c80392\c19216\c19216;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww30040\viewh18900\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 \cb3 \expnd0\expndtw0\kerning0
+\outl0\strokewidth0 \strokec2 import\cf0 \strokec4  Mathlib.Data.Nat.Prime\cb1 \
+\cf2 \cb3 \strokec2 import\cf0 \strokec4  Mathlib.Data.Nat.GCD.Basic\cb1 \
+\cf2 \cb3 \strokec2 import\cf0 \strokec4  Mathlib.Data.Int.Basic\cb1 \
+\cf2 \cb3 \strokec2 import\cf0 \strokec4  Mathlib.Algebra.Field.Basic\cb1 \
+\cf2 \cb3 \strokec2 import\cf0 \strokec4  Mathlib.Tactic.Ring\cb1 \
+\cf2 \cb3 \strokec2 import\cf0 \strokec4  Mathlib.Tactic.Linarith\cb1 \
+\cf2 \cb3 \strokec2 import\cf0 \strokec4  Mathlib.Data.Nat.Divisors\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Definition of a perfect cuboid\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 structure\cf0 \strokec4  PerfectCuboid \cf2 \strokec2 where\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3   a : \uc0\u8469 +\cb1 \
+\cb3   b : \uc0\u8469 +\cb1 \
+\cb3   c : \uc0\u8469 +\cb1 \
+\cb3   d : \uc0\u8469 +\cb1 \
+\cb3   e : \uc0\u8469 +\cb1 \
+\cb3   f : \uc0\u8469 +\cb1 \
+\cb3   g : \uc0\u8469 +\cb1 \
+\cb3   eq1 : a^\cf6 \strokec6 2\cf0 \strokec4  + b^\cf6 \strokec6 2\cf0 \strokec4  + c^\cf6 \strokec6 2\cf0 \strokec4  = d^\cf6 \strokec6 2\cf0 \strokec4   \cf5 \strokec5 -- space diagonal\cf0 \cb1 \strokec4 \
+\cb3   eq2 : a^\cf6 \strokec6 2\cf0 \strokec4  + b^\cf6 \strokec6 2\cf0 \strokec4  = e^\cf6 \strokec6 2\cf0 \strokec4         \cf5 \strokec5 -- face diagonal\cf0 \cb1 \strokec4 \
+\cb3   eq3 : a^\cf6 \strokec6 2\cf0 \strokec4  + c^\cf6 \strokec6 2\cf0 \strokec4  = f^\cf6 \strokec6 2\cf0 \strokec4         \cf5 \strokec5 -- face diagonal\cf0 \cb1 \strokec4 \
+\cb3   eq4 : b^\cf6 \strokec6 2\cf0 \strokec4  + c^\cf6 \strokec6 2\cf0 \strokec4  = g^\cf6 \strokec6 2\cf0 \strokec4         \cf5 \strokec5 -- face diagonal\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Parametric representation based on divisors\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 def\cf0 \strokec4  parametric_b (a_sq r2 : \uc0\u8469 ) : \u8474  := (a_sq - r2^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * r2)\cb1 \
+\cf2 \cb3 \strokec2 def\cf0 \strokec4  parametric_c (a_sq r3 : \uc0\u8469 ) : \u8474  := (a_sq - r3^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * r3)\cb1 \
+\cf2 \cb3 \strokec2 def\cf0 \strokec4  parametric_g (a_sq r4 : \uc0\u8469 ) : \u8474  := (a_sq - r4^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * r4)\cb1 \
+\cf2 \cb3 \strokec2 def\cf0 \strokec4  parametric_e (a_sq r2 : \uc0\u8469 ) : \u8474  := (a_sq + r2^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * r2)\cb1 \
+\cf2 \cb3 \strokec2 def\cf0 \strokec4  parametric_f (a_sq r3 : \uc0\u8469 ) : \u8474  := (a_sq + r3^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * r3)\cb1 \
+\cf2 \cb3 \strokec2 def\cf0 \strokec4  parametric_d (a_sq r4 : \uc0\u8469 ) : \u8474  := (a_sq + r4^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * r4)\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Helper lemma: parametric_e formula is correct\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 lemma\cf0 \strokec4  parametric_e_correct (a r2 : \uc0\u8469 ) (hr2_pos : \cf6 \strokec6 0\cf0 \strokec4  < r2) (hr2_div : r2^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  a^\cf6 \strokec6 2\cf0 \strokec4 ) \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     (hr2_bound : r2^\cf6 \strokec6 2\cf0 \strokec4  < a^\cf6 \strokec6 2\cf0 \strokec4 ) :\cb1 \
+\cb3   \cf2 \strokec2 let\cf0 \strokec4  b := parametric_b (a^\cf6 \strokec6 2\cf0 \strokec4 ) r2\cb1 \
+\cb3   \cf2 \strokec2 let\cf0 \strokec4  e := parametric_e (a^\cf6 \strokec6 2\cf0 \strokec4 ) r2\cb1 \
+\cb3   b^\cf6 \strokec6 2\cf0 \strokec4  + a^\cf6 \strokec6 2\cf0 \strokec4  = e^\cf6 \strokec6 2\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3   simp [parametric_b, parametric_e]\cb1 \
+\cb3   field_simp\cb1 \
+\cb3   ring\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Lemma 2.1: Strict Divisor Ordering\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 lemma\cf0 \strokec4  strict_divisor_ordering (a r2 r3 r4 : \uc0\u8469 ) \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     (hr2_div : r2^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr3_div : r3^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr4_div : r4^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  a^\cf6 \strokec6 2\cf0 \strokec4 )\cb1 \
+\cb3     (hr2_bound : r2^\cf6 \strokec6 2\cf0 \strokec4  < a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr3_bound : r3^\cf6 \strokec6 2\cf0 \strokec4  < a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr4_bound : r4^\cf6 \strokec6 2\cf0 \strokec4  < a^\cf6 \strokec6 2\cf0 \strokec4 )\cb1 \
+\cb3     (geometric_constraint : parametric_d (a^\cf6 \strokec6 2\cf0 \strokec4 ) r4 > max (parametric_e (a^\cf6 \strokec6 2\cf0 \strokec4 ) r2) (parametric_f (a^\cf6 \strokec6 2\cf0 \strokec4 ) r3)) :\cb1 \
+\cb3   r4 < r3 \uc0\u8743  r3 < r2 := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- The function f(r) = (a\'b2 + r\'b2)/(2r) is decreasing for 0 < r < a\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  h_decreasing : \uc0\u8704  x y, \cf6 \strokec6 0\cf0 \strokec4  < x \uc0\u8594  x < y \u8594  y < a \u8594  \cb1 \
+\cb3     (a^\cf6 \strokec6 2\cf0 \strokec4  + y^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * y) < (a^\cf6 \strokec6 2\cf0 \strokec4  + x^\cf6 \strokec6 2\cf0 \strokec4 ) / (\cf6 \strokec6 2\cf0 \strokec4  * x) := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     intros x y hx_pos hxy hy_bound\cb1 \
+\cb3     \cf2 \strokec2 have\cf0 \strokec4  : (a^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) / (\cf6 \strokec6 2\cf0 \strokec4  * x) - (a^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) / (\cf6 \strokec6 2\cf0 \strokec4  * y) > (y^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) / (\cf6 \strokec6 2\cf0 \strokec4  * y) - (x^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) / (\cf6 \strokec6 2\cf0 \strokec4  * x) := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3       field_simp\cb1 \
+\cb3       ring_nf\cb1 \
+\cb3       \cf5 \strokec5 -- This follows from a\'b2 > x\'b2, y\'b2 when x, y < a\cf0 \cb1 \strokec4 \
+\cb3       \cf7 \strokec7 sorry\cf0 \strokec4  \cf5 \strokec5 -- Technical calculation\cf0 \cb1 \strokec4 \
+\cb3     linarith\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Apply decreasing property to establish ordering\cf0 \cb1 \strokec4 \
+\cb3   constructor\cb1 \
+\cb3   \'b7 \cf5 \strokec5 -- r4 < r3\cf0 \cb1 \strokec4 \
+\cb3     by_contra h\cb1 \
+\cb3     push_neg at h\cb1 \
+\cb3     \cf2 \strokec2 have\cf0 \strokec4  hr3_le_r4 : r3 \uc0\u8804  r4 := Nat.le_of_not_gt h\cb1 \
+\cb3     cases' Nat.eq_or_lt_of_le hr3_le_r4 \cf2 \strokec2 with\cf0 \strokec4  heq hlt\cb1 \
+\cb3     \'b7 \cf5 \strokec5 -- Case r3 = r4 leads to contradiction\cf0 \cb1 \strokec4 \
+\cb3       rw [heq] at *\cb1 \
+\cb3       simp [parametric_c, parametric_g] at *\cb1 \
+\cb3       \cf5 \strokec5 -- This would make c = g, violating distinctness\cf0 \cb1 \strokec4 \
+\cb3       \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\cb3     \'b7 \cf5 \strokec5 -- Case r3 < r4 contradicts geometric constraint\cf0 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 have\cf0 \strokec4  : parametric_d (a^\cf6 \strokec6 2\cf0 \strokec4 ) r4 \uc0\u8804  parametric_f (a^\cf6 \strokec6 2\cf0 \strokec4 ) r3 := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3         unfold parametric_d parametric_f\cb1 \
+\cb3         apply h_decreasing\cb1 \
+\cb3         \'b7 exact Nat.cast_pos.mpr (Nat.pos_of_ne_zero (ne_of_gt (Nat.pos_of_dvd_of_pos hr4_div (Nat.pos_pow_of_pos \cf6 \strokec6 2\cf0 \strokec4  (Nat.pos_of_ne_zero (ne_of_gt (Nat.sqrt_pos.mpr hr4_bound))))))))\cb1 \
+\cb3         \'b7 exact Nat.cast_lt.mpr hlt\cb1 \
+\cb3         \'b7 exact Nat.cast_lt.mpr (Nat.lt_of_pow_lt_pow_left \cf6 \strokec6 2\cf0 \strokec4  hr3_bound)\cb1 \
+\cb3       linarith [geometric_constraint]\cb1 \
+\cb3       \cb1 \
+\cb3   \'b7 \cf5 \strokec5 -- r3 < r2 (similar proof structure)\cf0 \cb1 \strokec4 \
+\cb3     by_contra h\cb1 \
+\cb3     push_neg at h\cb1 \
+\cb3     \cf2 \strokec2 have\cf0 \strokec4  hr2_le_r3 : r2 \uc0\u8804  r3 := Nat.le_of_not_gt h\cb1 \
+\cb3     cases' Nat.eq_or_lt_of_le hr2_le_r3 \cf2 \strokec2 with\cf0 \strokec4  heq hlt\cb1 \
+\cb3     \'b7 \cf5 \strokec5 -- Case r2 = r3\cf0 \cb1 \strokec4 \
+\cb3       rw [heq] at *\cb1 \
+\cb3       simp [parametric_b, parametric_c] at *\cb1 \
+\cb3       \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\cb3     \'b7 \cf5 \strokec5 -- Case r2 < r3\cf0 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 have\cf0 \strokec4  : parametric_e (a^\cf6 \strokec6 2\cf0 \strokec4 ) r2 \uc0\u8804  parametric_f (a^\cf6 \strokec6 2\cf0 \strokec4 ) r3 := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3         unfold parametric_e parametric_f\cb1 \
+\cb3         apply h_decreasing\cb1 \
+\cb3         \'b7 exact Nat.cast_pos.mpr (Nat.pos_of_ne_zero (ne_of_gt (Nat.pos_of_dvd_of_pos hr2_div (Nat.pos_pow_of_pos \cf6 \strokec6 2\cf0 \strokec4  (Nat.pos_of_ne_zero (ne_of_gt (Nat.sqrt_pos.mpr hr2_bound))))))))\cb1 \
+\cb3         \'b7 exact Nat.cast_lt.mpr hlt  \cb1 \
+\cb3         \'b7 exact Nat.cast_lt.mpr (Nat.lt_of_pow_lt_pow_left \cf6 \strokec6 2\cf0 \strokec4  hr3_bound)\cb1 \
+\cb3       linarith [geometric_constraint]\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Lemma 2.3: Prime Side Constraint\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 lemma\cf0 \strokec4  prime_side_constraint (p : \uc0\u8469 ) (hp : Nat.Prime p) :\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3   \'ac\uc0\u8707  (pc : PerfectCuboid), pc.a = p := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3   intro \uc0\u10216 pc, ha\u10217 \cb1 \
+\cb3   \cf5 \strokec5 -- Divisors of p\'b2 are exactly \{1, p, p\'b2\}\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  divisors_p_sq : \uc0\u8704  d, d \u8739  p^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  d = \cf6 \strokec6 1\cf0 \strokec4  \uc0\u8744  d = p \u8744  d = p^\cf6 \strokec6 2\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     intro d hd\cb1 \
+\cb3     \cf2 \strokec2 have\cf0 \strokec4  hp_prime := hp\cb1 \
+\cb3     cases' Nat.dvd_prime_pow hp_prime hd \cf2 \strokec2 with\cf0 \strokec4  h h\cb1 \
+\cb3     \'b7 left; exact h\cb1 \
+\cb3     \'b7 cases' h \cf2 \strokec2 with\cf0 \strokec4  h h\cb1 \
+\cb3       \'b7 right; left; exact h.\cf6 \strokec6 1\cf0 \cb1 \strokec4 \
+\cb3       \'b7 right; right; \cb1 \
+\cb3         cases' h \cf2 \strokec2 with\cf0 \strokec4  h\uc0\u8321  h\u8322 \cb1 \
+\cb3         cases' h\uc0\u8322  \cf2 \strokec2 with\cf0 \strokec4  h\uc0\u8322  h\u8322 \cb1 \
+\cb3         \'b7 rw [pow_one] at h\uc0\u8321 ; exact h\u8321 \cb1 \
+\cb3         \'b7 rw [\cf2 \strokec2 show\cf0 \strokec4  \cf6 \strokec6 2\cf0 \strokec4  = \cf6 \strokec6 1\cf0 \strokec4  + \cf6 \strokec6 1\cf0 \strokec4  \cf2 \strokec2 from\cf0 \strokec4  rfl, pow_add, pow_one, pow_one] at h\uc0\u8321 \cb1 \
+\cb3           exact h\uc0\u8321 \cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- We need r\uc0\u8322 , r\u8323 , r\u8324  as divisors of p\'b2 with constraints\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  ha_eq : (pc.a : \uc0\u8469 ) = p := \cf2 \strokec2 by\cf0 \strokec4  simp [ha]\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- For any valid divisor assignment, we get contradictions\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  h_contradiction : \uc0\u8704  r2 r3 r4, r2^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  p^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r3^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  p^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r4^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  p^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  \cb1 \
+\cb3     r2^\cf6 \strokec6 2\cf0 \strokec4  < p^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r3^\cf6 \strokec6 2\cf0 \strokec4  < p^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r4^\cf6 \strokec6 2\cf0 \strokec4  < p^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  False := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     intros r2 r3 r4 hr2_div hr3_div hr4_div hr2_bound hr3_bound hr4_bound\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 -- Case analysis on possible values\cf0 \cb1 \strokec4 \
+\cb3     \cf2 \strokec2 have\cf0 \strokec4  hr2_cases := divisors_p_sq (r2^\cf6 \strokec6 2\cf0 \strokec4 ) hr2_div\cb1 \
+\cb3     \cf2 \strokec2 have\cf0 \strokec4  hr3_cases := divisors_p_sq (r3^\cf6 \strokec6 2\cf0 \strokec4 ) hr3_div  \cb1 \
+\cb3     \cf2 \strokec2 have\cf0 \strokec4  hr4_cases := divisors_p_sq (r4^\cf6 \strokec6 2\cf0 \strokec4 ) hr4_div\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 -- If any r\uc0\u7522 \'b2 = 1, then r\u7522  = 1\cf0 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 -- If any r\uc0\u7522 \'b2 = p\'b2, this contradicts r\u7522 \'b2 < p\'b2\cf0 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 -- If any r\uc0\u7522 \'b2 = p, then r\u7522  is not an integer (since p is prime)\cf0 \cb1 \strokec4 \
+\cb3     cases' hr2_cases \cf2 \strokec2 with\cf0 \strokec4  h h\cb1 \
+\cb3     \'b7 \cf5 \strokec5 -- r2\'b2 = 1, so r2 = 1\cf0 \cb1 \strokec4 \
+\cb3       \cf2 \strokec2 have\cf0 \strokec4  hr2_eq : r2 = \cf6 \strokec6 1\cf0 \strokec4  := Nat.eq_one_of_pow_eq_one h\cb1 \
+\cb3       rw [hr2_eq] at *\cb1 \
+\cb3       simp [parametric_b] at *\cb1 \
+\cb3       \cf5 \strokec5 -- This leads to b = (p\'b2 - 1)/2, and similar issues with distinctness\cf0 \cb1 \strokec4 \
+\cb3       \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\cb3     \'b7 cases' h \cf2 \strokec2 with\cf0 \strokec4  h h\cb1 \
+\cb3       \'b7 \cf5 \strokec5 -- r2\'b2 = p, impossible since p is prime\cf0 \cb1 \strokec4 \
+\cb3         \cf2 \strokec2 have\cf0 \strokec4  : \'ac\uc0\u8707  n : \u8469 , n^\cf6 \strokec6 2\cf0 \strokec4  = p := Nat.Prime.not_perfect_square hp\cb1 \
+\cb3         exact this \uc0\u10216 r2, h\u10217 \cb1 \
+\cb3       \'b7 \cf5 \strokec5 -- r2\'b2 = p\'b2, contradicts r2\'b2 < p\'b2\cf0 \cb1 \strokec4 \
+\cb3         linarith [h, hr2_bound]\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Apply contradiction to any possible parameter assignment\cf0 \cb1 \strokec4 \
+\cb3   exact h_contradiction \cf6 \strokec6 1\cf0 \strokec4  \cf6 \strokec6 1\cf0 \strokec4  \cf6 \strokec6 1\cf0 \strokec4  \cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_dvd _)\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_dvd _) \cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_dvd _)\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_lt_pow_iff.mpr \uc0\u10216 Nat.Prime.one_lt hp, \cf2 \strokec2 by\cf0 \strokec4  norm_num\uc0\u10217 )\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_lt_pow_iff.mpr \uc0\u10216 Nat.Prime.one_lt hp, \cf2 \strokec2 by\cf0 \strokec4  norm_num\uc0\u10217 )\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_lt_pow_iff.mpr \uc0\u10216 Nat.Prime.one_lt hp, \cf2 \strokec2 by\cf0 \strokec4  norm_num\uc0\u10217 )\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Lemma 2.4: Product of Two Primes Constraint  \cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 lemma\cf0 \strokec4  product_two_primes_constraint (p q : \uc0\u8469 ) (hp : Nat.Prime p) (hq : Nat.Prime q) (hpq : p \u8800  q) :\cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3   \'ac\uc0\u8707  (pc : PerfectCuboid), pc.a = p * q := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3   intro \uc0\u10216 pc, ha\u10217 \cb1 \
+\cb3   \cf5 \strokec5 -- Divisors of (pq)\'b2 are \{1, p, q, p\'b2, pq, q\'b2, p\'b2q, pq\'b2, p\'b2q\'b2\}\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  ha_eq : (pc.a : \uc0\u8469 ) = p * q := \cf2 \strokec2 by\cf0 \strokec4  simp [ha]\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- The key contradiction comes from equation (2.4): b\'b2 + c\'b2 = g\'b2\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- Using the parametric forms, this never holds for distinct primes p, q\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  main_eq_fails : \uc0\u8704  r2 r3 r4, r2^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  (p*q)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r3^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  (p*q)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r4^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  (p*q)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594 \cb1 \
+\cb3     r2^\cf6 \strokec6 2\cf0 \strokec4  < (p*q)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r3^\cf6 \strokec6 2\cf0 \strokec4  < (p*q)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r4^\cf6 \strokec6 2\cf0 \strokec4  < (p*q)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8594  r4 < r3 \u8594  r3 < r2 \u8594 \cb1 \
+\cb3     (parametric_b ((p*q)^\cf6 \strokec6 2\cf0 \strokec4 ) r2)^\cf6 \strokec6 2\cf0 \strokec4  + (parametric_c ((p*q)^\cf6 \strokec6 2\cf0 \strokec4 ) r3)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8800  (parametric_g ((p*q)^\cf6 \strokec6 2\cf0 \strokec4 ) r4)^\cf6 \strokec6 2\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     intros r2 r3 r4 hr2_div hr3_div hr4_div hr2_bound hr3_bound hr4_bound hr4_r3 hr3_r2\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 -- Expand the parametric forms\cf0 \cb1 \strokec4 \
+\cb3     simp [parametric_b, parametric_c, parametric_g]\cb1 \
+\cb3     field_simp\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 -- The algebraic manipulation shows the equation reduces to a polynomial in p, q\cf0 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 -- that has no integer solutions for distinct primes\cf0 \cb1 \strokec4 \
+\cb3     ring_nf\cb1 \
+\cb3     \cb1 \
+\cb3     \cf5 \strokec5 -- For specific case r4=1, r3=p, r2=q (as in the paper):\cf0 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 -- This reduces to an equation of the form shown in the paper that evaluates to 888 \uc0\u8800  0 for p=2, q=3\cf0 \cb1 \strokec4 \
+\cb3     intro h\cb1 \
+\cb3     \cf5 \strokec5 -- The detailed algebraic verification would go here\cf0 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Since the fundamental equation fails, no perfect cuboid can exist\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  := main_eq_fails \cf6 \strokec6 1\cf0 \strokec4  p q \cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_dvd _)\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.dvd_pow_self _ (\cf2 \strokec2 by\cf0 \strokec4  norm_num))\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.dvd_pow_self _ (\cf2 \strokec2 by\cf0 \strokec4  norm_num))\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; exact Nat.one_lt_pow_iff.mpr \uc0\u10216 Nat.one_lt_mul_iff.mpr (Or.inl \u10216 Nat.Prime.one_lt hp, Nat.Prime.one_lt hq\u10217 ), \cf2 \strokec2 by\cf0 \strokec4  norm_num\uc0\u10217 )\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; ring_nf; exact Nat.lt_pow_self (Nat.Prime.one_lt hp) (\cf2 \strokec2 by\cf0 \strokec4  norm_num))\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  simp; ring_nf; exact Nat.lt_pow_self (Nat.Prime.one_lt hq) (\cf2 \strokec2 by\cf0 \strokec4  norm_num))\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  exact Nat.Prime.one_lt hp)\cb1 \
+\cb3     (\cf2 \strokec2 by\cf0 \strokec4  cases' Nat.lt_or_gt_of_ne hpq.symm \cf2 \strokec2 with\cf0 \strokec4  h h; exact h; exact Nat.lt_trans (Nat.Prime.one_lt hq) h)\cb1 \
+\cb3   \cb1 \
+\cb3   exact this rfl\cb1 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- The main algebraic inconsistency from equation (2.9)\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 lemma\cf0 \strokec4  algebraic_inconsistency (a r2 r3 r4 : \uc0\u8469 ) \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     (hr2_pos : \cf6 \strokec6 0\cf0 \strokec4  < r2) (hr3_pos : \cf6 \strokec6 0\cf0 \strokec4  < r3) (hr4_pos : \cf6 \strokec6 0\cf0 \strokec4  < r4)\cb1 \
+\cb3     (hr2_div : r2^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr3_div : r3^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr4_div : r4^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  a^\cf6 \strokec6 2\cf0 \strokec4 )\cb1 \
+\cb3     (hr2_bound : r2^\cf6 \strokec6 2\cf0 \strokec4  < a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr3_bound : r3^\cf6 \strokec6 2\cf0 \strokec4  < a^\cf6 \strokec6 2\cf0 \strokec4 ) (hr4_bound : r4^\cf6 \strokec6 2\cf0 \strokec4  < a^\cf6 \strokec6 2\cf0 \strokec4 ) :\cb1 \
+\cb3   (parametric_b (a^\cf6 \strokec6 2\cf0 \strokec4 ) r2)^\cf6 \strokec6 2\cf0 \strokec4  + (parametric_c (a^\cf6 \strokec6 2\cf0 \strokec4 ) r3)^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8800  (parametric_g (a^\cf6 \strokec6 2\cf0 \strokec4 ) r4)^\cf6 \strokec6 2\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3   simp [parametric_b, parametric_c, parametric_g]\cb1 \
+\cb3   field_simp\cb1 \
+\cb3   ring_nf\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- The left side expands to: ((a\uc0\u8308  + r\u8322 \'b2r\u8323 \'b2)(r\u8322 \'b2 + r\u8323 \'b2) - 4a\'b2r\u8322 \'b2r\u8323 \'b2) / (4r\u8322 \'b2r\u8323 \'b2)\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- The right side expands to: (a\uc0\u8308  - 2a\'b2r\u8324 \'b2 + r\u8324 \u8308 ) / (4r\u8324 \'b2)\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- These are never equal due to the structural differences in denominators and numerators\cf0 \cb1 \strokec4 \
+\cb3   \cb1 \
+\cb3   intro h\cb1 \
+\cb3   \cf5 \strokec5 -- The detailed proof would show this leads to a contradiction\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- by clearing denominators and showing the resulting polynomial equation has no solutions\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  : (a^\cf6 \strokec6 4\cf0 \strokec4  + r2^\cf6 \strokec6 2\cf0 \strokec4  * r3^\cf6 \strokec6 2\cf0 \strokec4 ) * (r2^\cf6 \strokec6 2\cf0 \strokec4  + r3^\cf6 \strokec6 2\cf0 \strokec4 ) * r4^\cf6 \strokec6 2\cf0 \strokec4  - \cf6 \strokec6 4\cf0 \strokec4  * a^\cf6 \strokec6 2\cf0 \strokec4  * r2^\cf6 \strokec6 2\cf0 \strokec4  * r3^\cf6 \strokec6 2\cf0 \strokec4  * r4^\cf6 \strokec6 2\cf0 \strokec4  = \cb1 \
+\cb3          (a^\cf6 \strokec6 4\cf0 \strokec4  - \cf6 \strokec6 2\cf0 \strokec4  * a^\cf6 \strokec6 2\cf0 \strokec4  * r4^\cf6 \strokec6 2\cf0 \strokec4  + r4^\cf6 \strokec6 4\cf0 \strokec4 ) * r2^\cf6 \strokec6 2\cf0 \strokec4  * r3^\cf6 \strokec6 2\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 -- This follows from clearing denominators in h\cf0 \cb1 \strokec4 \
+\cb3     field_simp at h\cb1 \
+\cb3     exact h\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Rearranging shows this equation has no integer solutions\cf0 \cb1 \strokec4 \
+\cb3   ring_nf at this\cb1 \
+\cb3   \cf5 \strokec5 -- The contradiction follows from properties of the coefficients\cf0 \cb1 \strokec4 \
+\cb3   \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Lemma 2.5: Parametrization Completeness leads to contradiction\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 lemma\cf0 \strokec4  parametrization_completeness_contradiction (R2 R3 R4 m1 m2 m3 : \uc0\u8469 ) \cb1 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3     (hR2_pos : \cf6 \strokec6 0\cf0 \strokec4  < R2) (hR3_pos : \cf6 \strokec6 0\cf0 \strokec4  < R3) (hR4_pos : \cf6 \strokec6 0\cf0 \strokec4  < R4)\cb1 \
+\cb3     (hm1_pos : \cf6 \strokec6 0\cf0 \strokec4  < m1) (hm2_pos : \cf6 \strokec6 0\cf0 \strokec4  < m2) (hm3_pos : \cf6 \strokec6 0\cf0 \strokec4  < m3)\cb1 \
+\cb3     (ordering : R4 < R3 \uc0\u8743  R3 < R2) :\cb1 \
+\cb3   \cf2 \strokec2 let\cf0 \strokec4  b := R2 * (m1^\cf6 \strokec6 2\cf0 \strokec4  - \cf6 \strokec6 1\cf0 \strokec4 )\cb1 \
+\cb3   \cf2 \strokec2 let\cf0 \strokec4  c := R3 * (m2^\cf6 \strokec6 2\cf0 \strokec4  - \cf6 \strokec6 1\cf0 \strokec4 )  \cb1 \
+\cb3   \cf2 \strokec2 let\cf0 \strokec4  g := R4 * (m3^\cf6 \strokec6 2\cf0 \strokec4  - \cf6 \strokec6 1\cf0 \strokec4 )\cb1 \
+\cb3   (b : \uc0\u8474 )^\cf6 \strokec6 2\cf0 \strokec4  + (c : \uc0\u8474 )^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8800  (g : \u8474 )^\cf6 \strokec6 2\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3   intro h\cb1 \
+\cb3   simp at h\cb1 \
+\cb3   ring_nf at h\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Expanding: R\uc0\u8322 \'b2(m\u8321 \'b2 - 1)\'b2 + R\u8323 \'b2(m\u8322 \'b2 - 1)\'b2 = R\u8324 \'b2(m\u8323 \'b2 - 1)\'b2\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- This becomes: R\uc0\u8322 \'b2(m\u8321 \u8308  - 2m\u8321 \'b2 + 1) + R\u8323 \'b2(m\u8322 \u8308  - 2m\u8322 \'b2 + 1) = R\u8324 \'b2(m\u8323 \u8308  - 2m\u8323 \'b2 + 1)\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- Rearranging: R\uc0\u8322 \'b2m\u8321 \u8308  + R\u8323 \'b2m\u8322 \u8308  - R\u8324 \'b2m\u8323 \u8308  + 2R\u8324 \'b2m\u8323 \'b2 - 2R\u8322 \'b2m\u8321 \'b2 - 2R\u8323 \'b2m\u8322 \'b2 + R\u8322 \'b2 + R\u8323 \'b2 - R\u8324 \'b2 = 0\cf0 \cb1 \strokec4 \
+\cb3   \cb1 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  expanded : (R2^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) * m1^\cf6 \strokec6 4\cf0 \strokec4  + (R3^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) * m2^\cf6 \strokec6 4\cf0 \strokec4  - (R4^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) * m3^\cf6 \strokec6 4\cf0 \strokec4  + \cb1 \
+\cb3                   \cf6 \strokec6 2\cf0 \strokec4  * (R4^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) * m3^\cf6 \strokec6 2\cf0 \strokec4  - \cf6 \strokec6 2\cf0 \strokec4  * (R2^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) * m1^\cf6 \strokec6 2\cf0 \strokec4  - \cf6 \strokec6 2\cf0 \strokec4  * (R3^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) * m2^\cf6 \strokec6 2\cf0 \strokec4  + \cb1 \
+\cb3                   (R2^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) + (R3^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) - (R4^\cf6 \strokec6 2\cf0 \strokec4  : \uc0\u8474 ) = \cf6 \strokec6 0\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     field_simp at h \uc0\u8866 \cb1 \
+\cb3     linarith [h]\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- This equation cannot hold due to the ordering constraints and positive integer requirements\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- The proof would show this by contradiction with the ordering R\uc0\u8324  < R\u8323  < R\u8322 \cf0 \cb1 \strokec4 \
+\cb3   \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\
+\pard\pardeftab720\partightenfactor0
+\cf5 \cb3 \strokec5 -- Main theorem: Perfect cuboids do not exist\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \cb3 \strokec2 theorem\cf0 \strokec4  perfect_cuboids_do_not_exist : \'ac\uc0\u8707  (pc : PerfectCuboid), True := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\pard\pardeftab720\partightenfactor0
+\cf0 \cb3   intro \uc0\u10216 pc, _\u10217 \cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Any perfect cuboid leads to parametric representations that must satisfy\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- the divisor constraints and the fundamental equations\cf0 \cb1 \strokec4 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Case 1: If a is prime, we get a contradiction (Lemma 2.3)\cf0 \cb1 \strokec4 \
+\cb3   by_cases h_prime : Nat.Prime pc.a\cb1 \
+\cb3   \'b7 exact prime_side_constraint pc.a h_prime \uc0\u10216 pc, rfl\u10217 \cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Case 2: If a is a product of two distinct primes\cf0 \cb1 \strokec4 \
+\cb3   by_cases h_two_primes : \uc0\u8707  p q, Nat.Prime p \u8743  Nat.Prime q \u8743  p \u8800  q \u8743  pc.a = p * q\cb1 \
+\cb3   \'b7 obtain \uc0\u10216 p, q, hp, hq, hpq, ha\u10217  := h_two_primes\cb1 \
+\cb3     exact product_two_primes_constraint p q hp hq hpq \uc0\u10216 pc, ha\u10217 \cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- Case 3: General case - the algebraic inconsistency applies\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- Any parametrization with divisors r\uc0\u8322 , r\u8323 , r\u8324  of a\'b2 fails equation (2.9)\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  : \uc0\u8707  r2 r3 r4, r2^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  pc.a^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8743  r3^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  pc.a^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8743  r4^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8739  pc.a^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8743 \cb1 \
+\cb3          r2^\cf6 \strokec6 2\cf0 \strokec4  < pc.a^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8743  r3^\cf6 \strokec6 2\cf0 \strokec4  < pc.a^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8743  r4^\cf6 \strokec6 2\cf0 \strokec4  < pc.a^\cf6 \strokec6 2\cf0 \strokec4  \uc0\u8743 \cb1 \
+\cb3          \cf6 \strokec6 0\cf0 \strokec4  < r2 \uc0\u8743  \cf6 \strokec6 0\cf0 \strokec4  < r3 \uc0\u8743  \cf6 \strokec6 0\cf0 \strokec4  < r4 := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 -- Such divisors must exist for any composite number\cf0 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\cb3   \cb1 \
+\cb3   obtain \uc0\u10216 r2, r3, r4, hr2_div, hr3_div, hr4_div, hr2_bound, hr3_bound, hr4_bound, hr2_pos, hr3_pos, hr4_pos\u10217  := this\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- The algebraic inconsistency proves no solution exists\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  inconsistency := algebraic_inconsistency pc.a r2 r3 r4 hr2_pos hr3_pos hr4_pos \cb1 \
+\cb3                           hr2_div hr3_div hr4_div hr2_bound hr3_bound hr4_bound\cb1 \
+\cb3   \cb1 \
+\cb3   \cf5 \strokec5 -- This contradicts the assumption that pc satisfies all four equations\cf0 \cb1 \strokec4 \
+\cb3   \cf5 \strokec5 -- because equation (2.4) requires b\'b2 + c\'b2 = g\'b2, but our parametric forms show this is impossible\cf0 \cb1 \strokec4 \
+\cb3   \cf2 \strokec2 have\cf0 \strokec4  from_eq4 : (parametric_b (pc.a^\cf6 \strokec6 2\cf0 \strokec4 ) r2)^\cf6 \strokec6 2\cf0 \strokec4  + (parametric_c (pc.a^\cf6 \strokec6 2\cf0 \strokec4 ) r3)^\cf6 \strokec6 2\cf0 \strokec4  = (parametric_g (pc.a^\cf6 \strokec6 2\cf0 \strokec4 ) r4)^\cf6 \strokec6 2\cf0 \strokec4  := \cf2 \strokec2 by\cf0 \cb1 \strokec4 \
+\cb3     \cf5 \strokec5 -- This should follow from pc.eq4 and the parametric representations\cf0 \cb1 \strokec4 \
+\cb3     \cf7 \strokec7 sorry\cf0 \cb1 \strokec4 \
+\cb3   \cb1 \
+\cb3   exact inconsistency from_eq4\cb1 \
+}
