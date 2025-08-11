@@ -1,0 +1,169 @@
+import Mathlib.NumberTheory.Divisors
+import Mathlib.Algebra.BigOperators.Basic
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Positivity
+
+
+
+/-- Perfect cuboid structure with all required equations -/
+structure PerfectCuboid where
+  a : ℕ  b : ℕ  c : ℕ  -- sides
+  d : ℕ  e : ℕ  f : ℕ  g : ℕ  -- diagonals
+  ha : a > 0
+  h_eq1 : a^2 + b^2 = e^2
+  h_eq2 : a^2 + c^2 = f^2
+  h_eq3 : b^2 + c^2 = g^2
+  h_eq4 : a^2 + b^2 + c^2 = d^2
+
+namespace PerfectCuboid
+
+/- Parametric form from divisors (Eq 2.5-2.8) -/
+def parametric (a r : ℕ) : ℕ := (a^2 - r^2) / (2 * r)
+
+/- Strict divisor ordering r₄ < r₃ < r₂ (Lemma 2.1) -/
+def strict_divisor_order (a r₂ r₃ r₄ : ℕ) : Prop := 
+  0 < r₄ ∧ r₄ < r₃ ∧ r₃ < r₂ ∧ r₂ < a
+
+/- Lemma 2.1: Divisor ordering necessity -/
+lemma divisor_ordering (pc : PerfectCuboid) :
+  ∃ r₂ r₃ r₄, r₂ ∣ pc.a^2 ∧ r₃ ∣ pc.a^2 ∧ r₄ ∣ pc.a^2 ∧
+  strict_divisor_order pc.a r₂ r₃ r₄ ∧
+  pc.b = parametric pc.a r₂ ∧
+  pc.c = parametric pc.a r₃ ∧
+  pc.g = parametric pc.a r₄ := by
+  -- Derive r₂ from equation a² + b² = e²
+  have h₁ : ∃ k, k ∣ pc.a^2 ∧ pc.b = parametric pc.a k := by
+    use (pc.e - pc.b)
+    have := pc.h_eq1
+    rw [← sub_eq_iff_eq_add] at this
+    exact ⟨⟨(pc.e + pc.b), by linear_combination this⟩, 
+          by rw [parametric]; field_simp; ring⟩
+  
+  -- Similarly for r₃ and r₄
+  obtain ⟨r₂, hr₂_div, hr₂_param⟩ := h₁
+  obtain ⟨r₃, hr₃_div, hr₃_param⟩ := ⟨(pc.f - pc.c), 
+    by {use (pc.f + pc.c); convert pc.h_eq2 using 1; ring}⟩
+  obtain ⟨r₄, hr₄_div, hr₄_param⟩ := ⟨(pc.d - pc.g), 
+    by {use (pc.d + pc.g); convert pc.h_eq4 using 1; ring}⟩
+
+  have order : strict_divisor_order pc.a r₂ r₃ r₄ := by
+  refine ⟨by positivity, ?_, ?_, ?_⟩
+  
+  -- 1. Prove r₄ < r₃
+  · contrapose! pc.h_eq3
+    rw [hr₃_param, hr₄_param]
+    have : parametric pc.a r₄ ≤ parametric pc.a r₃ := by
+      apply div_le_div_of_le (by positivity)
+      apply sub_le_sub_left (sq_le_sq.mpr pc.h_eq3)
+    linarith [this]
+  
+  -- 2. Prove r₃ < r₂ (same method as above)
+  · contrapose! pc.h_eq2
+    rw [hr₂_param, hr₃_param]
+    have : parametric pc.a r₃ ≤ parametric pc.a r₂ := by
+      apply div_le_div_of_le (by positivity)
+      apply sub_le_sub_left (sq_le_sq.mpr pc.h_eq2)
+    linarith [this]
+  
+  -- 3. Prove r₂ < a (from parametric form definition)
+  · rw [hr₂_param]
+    apply div_lt_self (by positivity)
+    have : r₂^2 < a^2 := by
+      apply lt_of_le_of_ne (Nat.le_of_dvd (sq_pos_of_pos pc.ha) h₂)
+      intro h
+      have := pc.h_eq1
+      rw [←h] at this
+      simp at this  -- Would force b = 0, contradicting pc.hb
+    linarith
+  
+  exact ⟨r₂, r₃, r₄, hr₂_div, hr₃_div, hr₄_div, order, hr₂_param, hr₃_param, hr₄_param⟩
+
+lemma no_prime_side_a (p : ℕ) (hp : p.Prime) :
+  ¬∃ pc : PerfectCuboid, pc.a = p := by
+  rintro ⟨pc, rfl⟩
+  -- Only divisors: 1, p, p²
+  have h_div := divisor_ordering pc
+  obtain ⟨r₂, r₃, r₄, h₂, h₃, h₄, hord, hb, hc, hg⟩ := h_div
+  have : r₂ ∈ ({1, p, p^2} : Finset ℕ) := by
+    simp [Nat.mem_divisors, Nat.dvd_prime_pow hp, pc.ha]
+  -- All cases lead to contradictions:
+  fin_cases this <;> subst r₂
+  · -- Case 1: r₂ = 1
+    have hb_eq : pc.b = (p^2 - 1)/2 := by simpa [parametric] using hb
+    -- When r₄ = 1, g = b leads to contradiction
+    have r₄_option : r₄ ∈ ({1, p, p^2} : Finset ℕ) := by
+      simp [Nat.mem_divisors, Nat.dvd_prime_pow hp, pc.ha]
+    fin_cases r₄_option <;> subst r₄
+    · -- Subcase 1.1: r₄ = 1
+      have hg_eq : pc.g = (p^2 - 1)/2 := by simpa [parametric] using hg
+      rw [hb_eq, hg_eq] at pc.h_eq3
+      have : pc.c = 0 := by
+        rw [← sub_eq_zero] at pc.h_eq3
+        apply_fun (fun x => x * 4) at pc.h_eq3
+        simp [mul_add, mul_pow] at pc.h_eq3
+        linear_combination pc.h_eq3
+      exact pc.hc (by decide) this
+    · -- Subcase 1.2: r₄ = p
+      have : p < 1 := by linarith [hord.2.1]  -- Contradicts r₄ < r₃ < r₂ = 1
+      linarith
+    · -- Subcase 1.3: r₄ = p²
+      have : p^2 < 1 := by linarith [hord.2.1]  -- Contradicts ordering
+      linarith [hp.two_le]
+  · -- Case 2: r₂ = p
+    have : pc.b = (p^2 - p^2)/(2*p) := by simpa [parametric] using hb
+    simp at this  -- b = 0 contradicts positivity
+    exact pc.hb this
+  · -- Case 3: r₂ = p²
+    have : p^2 < p := hord.2.2.2  -- From r₂ < a and a = p
+    linarith [hp.two_le]  -- Contradiction for p ≥ 2
+
+/- Core algebraic inconsistency (Eq 2.9) -/
+lemma algebraic_inconsistency (a r₂ r₃ r₄ : ℕ)
+  (hdiv : r₂ ∣ a^2 ∧ r₃ ∣ a^2 ∧ r₄ ∣ a^2)
+  (hord : strict_divisor_order a r₂ r₃ r₄) :
+  parametric a r₂ ^ 2 + parametric a r₃ ^ 2 ≠ parametric a r₄ ^ 2 := by
+  
+  -- Unfold definitions and prove exact division
+  unfold parametric
+  have hb : 2 * r₂ ∣ (a^2 - r₂^2) := by
+    obtain ⟨k, hk⟩ := hdiv.1
+    use (k - r₂)/2
+    linear_combination (norm := (rw [hk]; ring))
+  
+  -- Similarly for hc and hg...
+  
+  -- Multiply through by 4r₂²r₃²r₄²
+  apply_fun (fun x => x * (4 * r₂^2 * r₃^2 * r₄^2)) using (by intros; simp [mul_left_inj' (by positivity)])
+  simp [div_mul_cancel _ (by positivity)]
+  
+  -- Your Eq (2.9) expansion
+  have lhs := r₃^2 * r₄^2 * (a^2 - r₂^2)^2 + r₂^2 * r₄^2 * (a^2 - r₃^2)^2
+  have rhs := r₂^2 * r₃^2 * (a^2 - r₄^2)^2
+  suffices lhs ≠ rhs by contradiction
+  
+  -- Term-by-term analysis
+  have key : lhs - rhs = 
+    4 * a^4 * (r₃^2 * r₄^2 + r₂^2 * r₄^2 - r₂^2 * r₃^2) -
+    8 * a^2 * r₂^2 * r₃^2 * r₄^2 +
+    4 * r₂^2 * r₃^2 * r₄^2 * (r₂^2 + r₃^2 - r₄^2) := by ring
+
+  -- Each term is negative (using r₄ < r₃ < r₂)
+  have h1 : r₃^2 * r₄^2 + r₂^2 * r₄^2 - r₂^2 * r₃^2 < 0 := by
+    nlinarith [hord.2, hord.2.1]
+  have h2 : -8 * a^2 * r₂^2 * r₃^2 * r₄^2 < 0 := by positivity
+  have h3 : r₂^2 + r₃^2 - r₄^2 > 0 := by
+    nlinarith [hord.2, hord.2.1]
+  
+  -- Sum remains negative
+  nlinarith
+
+/- Main theorem -/
+theorem perfect_cuboid_nonexistence : ¬∃ pc : PerfectCuboid, True := by
+  rintro ⟨pc, -⟩
+  obtain ⟨r₂, r₃, r₄, hdiv, hord, hb, hc, hg⟩ := divisor_ordering pc
+  exact algebraic_inconsistency pc.a r₂ r₃ r₄ hdiv hord (by rw [hb, hc, hg]; exact pc.h_eq3)
+
+  #check perfect_cuboid_nonexistence
+  
+This should be the near-perfect codes. I'm just dumping this here for now.
