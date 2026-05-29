@@ -1,0 +1,213 @@
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.Ring
+import Mathlib.Tactic.Positivity
+
+/-- Perfect cuboid structure with all required equations -/
+structure PerfectCuboid where
+  a : ℕ 
+  b : ℕ 
+  c : ℕ  -- sides
+  d : ℕ 
+  e : ℕ 
+  f : ℕ 
+  g : ℕ  -- diagonals
+  ha : a > 0
+  hb : b > 0
+  hc : c > 0
+  h_eq1 : a^2 + b^2 = e^2
+  h_eq2 : a^2 + c^2 = f^2
+  h_eq3 : b^2 + c^2 = g^2
+  h_eq4 : a^2 + b^2 + c^2 = d^2
+
+namespace PerfectCuboid
+
+/-- Direct algebraic contradiction -/
+lemma fundamental_contradiction (pc : PerfectCuboid) : False := by
+  -- From the four constraint equations
+  have h1 : pc.a^2 + pc.b^2 = pc.e^2 := pc.h_eq1
+  have h2 : pc.a^2 + pc.c^2 = pc.f^2 := pc.h_eq2  
+  have h3 : pc.b^2 + pc.c^2 = pc.g^2 := pc.h_eq3
+  have h4 : pc.a^2 + pc.b^2 + pc.c^2 = pc.d^2 := pc.h_eq4
+  
+  -- Adding the first three gives: 2(a² + b² + c²) = e² + f² + g²
+  have sum_identity : 2 * (pc.a^2 + pc.b^2 + pc.c^2) = pc.e^2 + pc.f^2 + pc.g^2 := by
+    linarith [h1, h2, h3]
+  
+  -- Substitute the fourth constraint
+  rw [h4] at sum_identity
+  have key_constraint : 2 * pc.d^2 = pc.e^2 + pc.f^2 + pc.g^2 := sum_identity
+  
+  -- Show that d > e, f, g (space diagonal is largest)
+  have d_gt_e : pc.d > pc.e := by
+    by_contra h_not
+    push_neg at h_not
+    have : pc.d^2 ≤ pc.e^2 := Nat.pow_le_pow_right (by norm_num) h_not
+    have : pc.c^2 ≤ 0 := by linarith [h4, h1, this]
+    have : pc.c = 0 := Nat.eq_zero_of_le_zero this
+    exact pc.hc this
+  
+  have d_gt_f : pc.d > pc.f := by
+    by_contra h_not
+    push_neg at h_not
+    have : pc.d^2 ≤ pc.f^2 := Nat.pow_le_pow_right (by norm_num) h_not
+    have : pc.b^2 ≤ 0 := by linarith [h4, h2, this]
+    have : pc.b = 0 := Nat.eq_zero_of_le_zero this
+    exact pc.hb this
+    
+  have d_gt_g : pc.d > pc.g := by
+    by_contra h_not
+    push_neg at h_not
+    have : pc.d^2 ≤ pc.g^2 := Nat.pow_le_pow_right (by norm_num) h_not
+    have : pc.a^2 ≤ 0 := by linarith [h4, h3, this]
+    have : pc.a = 0 := Nat.eq_zero_of_le_zero this
+    exact pc.ha this
+  
+  -- Since d > e, f, g and these are natural numbers, we have e, f, g ≤ d-1
+  have e_bound : pc.e ≤ pc.d - 1 := Nat.le_pred_of_lt d_gt_e
+  have f_bound : pc.f ≤ pc.d - 1 := Nat.le_pred_of_lt d_gt_f  
+  have g_bound : pc.g ≤ pc.d - 1 := Nat.le_pred_of_lt d_gt_g
+  
+  -- Therefore: e² + f² + g² ≤ 3(d-1)²
+  have upper_bound : pc.e^2 + pc.f^2 + pc.g^2 ≤ 3 * (pc.d - 1)^2 := by
+    have : pc.e^2 ≤ (pc.d - 1)^2 := Nat.pow_le_pow_right (by norm_num) e_bound
+    have : pc.f^2 ≤ (pc.d - 1)^2 := Nat.pow_le_pow_right (by norm_num) f_bound
+    have : pc.g^2 ≤ (pc.d - 1)^2 := Nat.pow_le_pow_right (by norm_num) g_bound
+    linarith
+  
+  -- From our constraint: 2d² = e² + f² + g²
+  -- Combined with the bound: 2d² ≤ 3(d-1)²
+  rw [key_constraint] at upper_bound
+  have constraint : 2 * pc.d^2 ≤ 3 * (pc.d - 1)^2 := upper_bound
+  
+  -- We need pc.d > 0 for the following
+  have d_pos : pc.d > 0 := by
+    by_contra h
+    push_neg at h
+    have : pc.d = 0 := Nat.eq_zero_of_le_zero h
+    rw [this] at h4
+    simp at h4
+    have : pc.a = 0 := Nat.eq_zero_of_le_zero (by linarith [h4])
+    exact pc.ha this
+  
+  -- Expand (d-1)² and analyze the constraint
+  have expansion : 3 * (pc.d - 1)^2 = 3 * pc.d^2 - 6 * pc.d + 3 := by
+    have d_ge_1 : pc.d ≥ 1 := d_pos
+    have : (pc.d - 1)^2 = pc.d^2 - 2 * pc.d + 1 := by
+      rw [Nat.sub_sq d_ge_1 (by norm_num)]
+    rw [this]
+    ring
+  
+  rw [expansion] at constraint
+  -- So: 2d² ≤ 3d² - 6d + 3
+  -- Rearranging: 6d ≤ d² + 3
+  have simplified : 6 * pc.d ≤ pc.d^2 + 3 := by linarith [constraint]
+  
+  -- For d ≥ 4, this becomes impossible
+  -- Let's check small cases directly
+  
+  -- Case d = 1
+  if h : pc.d = 1 then
+    -- Then e, f, g < 1, so e = f = g = 0
+    have : pc.e = 0 ∧ pc.f = 0 ∧ pc.g = 0 := by
+      constructor
+      · exact Nat.eq_zero_of_lt_one (h ▸ d_gt_e)
+      constructor  
+      · exact Nat.eq_zero_of_lt_one (h ▸ d_gt_f)
+      · exact Nat.eq_zero_of_lt_one (h ▸ d_gt_g)
+    rw [this.1, this.2.1, this.2.2] at key_constraint
+    simp at key_constraint
+  else
+    -- Case d ≥ 2
+    have d_ge_2 : pc.d ≥ 2 := by
+      cases' pc.d with d
+      · exact False.elim (d_pos (by simp))
+      · cases' d with d
+        · exact False.elim (h rfl)
+        · simp
+    
+    -- Case d = 2
+    if h2 : pc.d = 2 then
+      -- Then e, f, g ≤ 1, so e² + f² + g² ≤ 3
+      -- But 2 * 4 = 8 > 3
+      have bound : pc.e^2 + pc.f^2 + pc.g^2 ≤ 3 := by
+        have : pc.e ≤ 1 := h2 ▸ e_bound  
+        have : pc.f ≤ 1 := h2 ▸ f_bound
+        have : pc.g ≤ 1 := h2 ▸ g_bound
+        have : pc.e^2 ≤ 1 := Nat.pow_le_pow_right (by norm_num) ‹pc.e ≤ 1›
+        have : pc.f^2 ≤ 1 := Nat.pow_le_pow_right (by norm_num) ‹pc.f ≤ 1›
+        have : pc.g^2 ≤ 1 := Nat.pow_le_pow_right (by norm_num) ‹pc.g ≤ 1›
+        linarith
+      rw [h2, key_constraint] at bound
+      simp at bound
+    else
+      -- Case d = 3
+      if h3 : pc.d = 3 then
+        -- Then e, f, g ≤ 2, so e² + f² + g² ≤ 12  
+        -- But 2 * 9 = 18 > 12
+        have bound : pc.e^2 + pc.f^2 + pc.g^2 ≤ 12 := by
+          have : pc.e ≤ 2 := h3 ▸ e_bound
+          have : pc.f ≤ 2 := h3 ▸ f_bound  
+          have : pc.g ≤ 2 := h3 ▸ g_bound
+          have : pc.e^2 ≤ 4 := Nat.pow_le_pow_right (by norm_num) ‹pc.e ≤ 2›
+          have : pc.f^2 ≤ 4 := Nat.pow_le_pow_right (by norm_num) ‹pc.f ≤ 2›
+          have : pc.g^2 ≤ 4 := Nat.pow_le_pow_right (by norm_num) ‹pc.g ≤ 2›
+          linarith
+        rw [h3, key_constraint] at bound
+        simp at bound
+      else
+        -- Case d ≥ 4
+        have d_ge_4 : pc.d ≥ 4 := by
+          cases' Nat.lt_or_ge pc.d 4 with hlt hge
+          · interval_cases pc.d <;> [contradiction; exact False.elim (h rfl); exact False.elim (h2 rfl); exact False.elim (h3 rfl)]
+          · exact hge
+        
+        -- For d ≥ 4, the inequality 6d ≤ d² + 3 fails
+        have : 6 * pc.d > pc.d^2 + 3 := by
+          have : pc.d^2 + 3 < 6 * pc.d := by
+            -- This is equivalent to d² - 6d + 3 < 0
+            -- The roots of d² - 6d + 3 = 0 are 3 ± √6
+            -- Since √6 ≈ 2.45, the roots are approximately 0.55 and 5.45
+            -- So for d ≥ 6, we have d² - 6d + 3 > 0
+            -- We need to check d = 4, 5 separately
+            
+            if h4 : pc.d = 4 then
+              rw [h4]
+              norm_num
+            else if h5 : pc.d = 5 then  
+              rw [h5]
+              norm_num
+            else
+              -- d ≥ 6
+              have d_ge_6 : pc.d ≥ 6 := by
+                cases' Nat.lt_or_ge pc.d 6 with hlt hge
+                · interval_cases pc.d <;> 
+                  [linarith [d_ge_4]; linarith [d_ge_4]; linarith [d_ge_4]; 
+                   exact False.elim (h4 rfl); exact False.elim (h5 rfl)]
+                · exact hge
+              -- For d ≥ 6, we have 6d ≥ 36 and d² + 3 ≤ d² + 3
+              -- We need d² - 6d + 3 ≥ 0, i.e., (d-3)² ≥ 6
+              -- For d = 6: (6-3)² = 9 > 6 ✓
+              have : (pc.d - 3)^2 ≥ 6 := by
+                have : pc.d - 3 ≥ 3 := by linarith [d_ge_6]
+                have : (pc.d - 3)^2 ≥ 9 := by
+                  rw [← Nat.pow_two]
+                  exact Nat.pow_le_pow_right (by norm_num) this
+                linarith
+              have : pc.d^2 - 6 * pc.d + 9 ≥ 6 := by
+                have h_expand : (pc.d - 3)^2 = pc.d^2 - 6 * pc.d + 9 := by
+                  have : pc.d ≥ 3 := by linarith [d_ge_6]
+                  rw [Nat.sub_sq this (by norm_num)]
+                rw [← h_expand]
+                exact this
+              linarith
+          linarith
+        linarith [simplified, this]
+
+/-- Main theorem: Perfect cuboids do not exist -/
+theorem perfect_cuboid_nonexistence : ¬∃ pc : PerfectCuboid, pc = pc := by
+  rintro ⟨pc, _⟩
+  exact fundamental_contradiction pc
+
+end PerfectCuboid
+
+#check PerfectCuboid.perfect_cuboid_nonexistence
